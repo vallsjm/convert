@@ -1,0 +1,14 @@
+{
+  "name": "@vallsjm/convert",
+  "version": "1.0.0",
+  "description": "Formatter an Convert units from differents sports",
+  "license": "MIT",
+  "repository": "vallsjm/convert",
+  "main": "formatter.js",
+  "keywords": [
+    "formatter",
+    "convert",
+    "sport",
+    "units"
+  ]
+}

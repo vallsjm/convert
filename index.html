@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Convert</title>
+  </head>
+  <body>
+    <script type="module">
+        import * as unit from './dist/units.js'
+        import Formatter from './dist/formatter.js'
+
+        var cv = new Formatter({
+            sport: 'ciclyng',
+            locale: 'es',
+            units: 'international'
+        });
+
+        // console.log(cv.convert(5, unit.UNIT_YARDS) + ' Yardas');
+        // console.log(cv.revert(5.468, unit.UNIT_YARDS) + ' Metros');
+        // console.log(cv.digits(unit.UNIT_YARDS) + ' dígitos de Yardas');
+        // console.log(cv.units(5.468, unit.UNIT_YARDS));
+        console.log(cv.formatDistance(500.4343434));
+        console.log(cv.formatSpeed(500.4343434));
+        console.log(cv.formatTSS(500.4343434, false));
+    </script>
+  </body>
+</html>
+<!-- https://www.freecodecamp.org/news/how-to-make-a-beautiful-tiny-npm-package-and-publish-it-2881d4307f78/ -->
