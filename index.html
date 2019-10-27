@@ -4,24 +4,54 @@
     <meta charset="UTF-8">
     <title>Convert</title>
   </head>
-  <body>
+  <body id="container">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js" integrity="sha256-AdQN98MVZs44Eq2yTwtoKufhnU+uZ7v2kXnD5vqzZVo=" crossorigin="anonymous"></script>
     <script type="module">
-        import * as unit from './dist/units.js'
-        import Formatter from './dist/formatter.js'
+        import i18n from './src/locale/es.js'
+        import Convert from './src/convert.js'
+        import Formatter from './src/formatter.js'
 
-        var cv = new Formatter({
+        var container = document.getElementById("container");
+
+        function write(text, tag = 'p') {
+            var content = document.createElement(tag);
+            content.innerHTML = text;
+            container.appendChild(content);
+        }
+
+        var cv = new Convert(i18n);
+
+        write("Convert",'h1');
+        write('5 Metros son ' + cv.convert(5, 'UNIT_YARDS') + ' Yardas');
+        write('5.468 Yardas son ' + cv.revert(5.468, 'UNIT_YARDS') + ' Metros');
+        write('Las Yardas tienen ' + cv.digits('UNIT_YARDS') + ' dígitos');
+        write('Mostrar Yardas con unidades ' + cv.units(5.468, 'UNIT_YARDS'));
+
+
+        var ft = new Formatter(i18n, {
             sport: 'ciclyng',
-            locale: 'es',
             units: 'international'
         });
 
-        // console.log(cv.convert(5, unit.UNIT_YARDS) + ' Yardas');
-        // console.log(cv.revert(5.468, unit.UNIT_YARDS) + ' Metros');
-        // console.log(cv.digits(unit.UNIT_YARDS) + ' dígitos de Yardas');
-        // console.log(cv.units(5.468, unit.UNIT_YARDS));
-        console.log(cv.formatDistance(500.4343434));
-        console.log(cv.formatSpeed(500.4343434));
-        console.log(cv.formatTSS(500.4343434, false));
+        write("Formatter",'h1');
+        write('500.4343434 Metros (ciclismo) son ' + ft.formatDistance(500.4343434));
+        write('500.4343434 Metros (ciclismo) son ' + ft.formatDistance(500.4343434, false));
+
+        ft.configure({
+            units: 'english'
+        })
+
+        write('500.4343434 Metros (ciclismo britanico) son ' + ft.formatDistance(500.4343434));
+
+        ft.configure({
+            sport: 'swimming',
+            units: 'international'
+        })
+
+        write('500.4343434 Metros (natación) son ' + ft.formatDistance(500.4343434));
+        write('1572176282 Timestamp son ' + ft.formatDate(1572176282));
+        write('1572176282 Timestamp son ' + ft.formatDateTime(1572176282));
+        write('1572176282 Timestamp son ' + ft.formatDateDay(1572176282));
     </script>
   </body>
 </html>

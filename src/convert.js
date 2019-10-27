@@ -1,17 +1,54 @@
-import * as constants from './units.js';
+import moment from 'moment'
 
 export default class Convert {
-    constructor(conf) {
+    constructor(i18n, conf) {
         this.convertTable = {};
-        this.unitNames = [];
-        this.init();
+        this.unitNames    = [];
+        this.i18n = i18n;
+        moment.locale(i18n.dates.locale);
+        this.load();
     }
+  
+    load() {
+        let t = this.i18n.units;
 
-    init() {
-        this.convertTable[constants.UNIT_KILOMETERS] = {
+        this.convertTable[t.UNIT_DATE] = {
+            unit: function (value) {
+                        return `${value}`;
+                    },
+            convert: function (value) {
+                        return moment.unix(value).format(t.UNIT_DATE);
+                    },
+            revert: function (value) {
+                        return moment(value, t.UNIT_DATE).unix();
+                    }
+        };
+        this.convertTable[t.UNIT_DATETIME] = {
+            unit: function (value) {
+                        return `${value}`;
+                    },
+            convert: function (value) {
+                        return moment.unix(value).format(t.UNIT_DATETIME);
+                    },
+            revert: function (value) {
+                        return moment(value, t.UNIT_DATE).unix();
+                    }
+        };
+        this.convertTable[t.UNIT_DATEDAY] = {
+            unit: function (value) {
+                        return `${value}`;
+                    },
+            convert: function (value) {
+                        return moment.unix(value).format(t.UNIT_DATEDAY);
+                    },
+            revert: function (value) {
+                        return moment(value, t.UNIT_DATE).unix();
+                    }
+        };                
+        this.convertTable[t.UNIT_KILOMETERS] = {
             digits: 2,
             unit: function (value) {
-                        return `${value} ${constants.UNIT_KILOMETERS}`;
+                        return `${value} ${t.UNIT_KILOMETERS}`;
                     },
             convert: function (value) {
                         return value / 1000;
@@ -20,7 +57,7 @@ export default class Convert {
                         return value * 1000;
                     }
         };
-        this.convertTable[constants.UNIT_YARDS] = {
+        this.convertTable[t.UNIT_YARDS] = {
             digits: 0,
             convert: function (value) {
                         return value * 1.0936;
@@ -29,7 +66,7 @@ export default class Convert {
                         return value / 1.0936;
                     }
         };
-        this.convertTable[constants.UNIT_MILES] = {
+        this.convertTable[t.UNIT_MILES] = {
             digits: 2,
             convert: function (value) {
                         return value * 0.00062137;
@@ -38,7 +75,7 @@ export default class Convert {
                         return value / 0.00062137;
                     }
         };
-        this.convertTable[constants.UNIT_FEETS] = {
+        this.convertTable[t.UNIT_FEETS] = {
             digits: 0,
             convert: function (value) {
                         return value * 3.28084;
@@ -47,16 +84,7 @@ export default class Convert {
                         return value / 3.28084;
                     }
         };
-        this.convertTable[constants.UNIT_METERS] = {
-            digits: 0,
-            convert: function (value) {
-                        return value;
-                    },
-            revert: function (value) {
-                        return value;
-                    }
-        };
-        this.convertTable[constants.UNIT_MILES_HOUR] = {
+        this.convertTable[t.UNIT_MILES_HOUR] = {
             digits: 2,
             convert: function (value) {
                         return value / 1.609344; // 1 milla = 1.609344 km
@@ -65,7 +93,7 @@ export default class Convert {
                         return value * 1.609344; // 1 milla = 1.609344 km
                     }
         };
-        this.convertTable[constants.UNIT_MIN_KILOMETER] = {
+        this.convertTable[t.UNIT_MIN_KILOMETER] = {
             digits: 2,
             convert: function (value) {
                         return (value) ? 60 / value : 0; //  1 min/km = 60 km/h
@@ -74,7 +102,7 @@ export default class Convert {
                         return (value) ? 60 / value : 0; // 1 milla = 1.609344 km
                     }
         };
-        this.convertTable[constants.UNIT_MIN_MILE] = {
+        this.convertTable[t.UNIT_MIN_MILE] = {
             digits: 2,
             convert: function (value) {
                         return (value) ? 96.56064 / value : 0; // 1 min/mile = 96.56064 km/h
@@ -83,7 +111,7 @@ export default class Convert {
                         return (value) ? 96.56064 / value : 0; // 1 min/mile = 96.56064 km/h
                     }
         };
-        this.convertTable[constants.UNIT_MIN_100METERS] = {
+        this.convertTable[t.UNIT_MIN_100METERS] = {
             digits: 2,
             convert: function (value) {
                         return (value) ? 6 / value : 0;
@@ -92,22 +120,13 @@ export default class Convert {
                         return (value) ? 6 / value : 0;
                     }
         };
-        this.convertTable[constants.UNIT_MIN_100YARDS] = {
+        this.convertTable[t.UNIT_MIN_100YARDS] = {
             digits: 2,
             convert: function (value) {
                         return (value) ? 5.4864 / value : 0;
                     },
             revert: function (value) {
                         return (value) ? 5.4864 / value : 0;
-                    }
-        };
-        this.convertTable[constants.UNIT_KILOMETERS_HOUR] = {
-            digits: 2,
-            convert: function (value) {
-                        return value;
-                    },
-            revert: function (value) {
-                        return value;
                     }
         };
 
@@ -115,8 +134,9 @@ export default class Convert {
     }
 
     digits(unit) {
-        if (this.unitNames.includes(unit)) {
-            var obj = this.convertTable[unit];
+        let n = this.i18n.units[unit];
+        if (this.unitNames.includes(n)) {
+            var obj = this.convertTable[n];
             if (obj.hasOwnProperty('digits')) {
                 return obj.digits;
             }
@@ -125,18 +145,20 @@ export default class Convert {
     }
 
     units(value, unit) {
-        if (this.unitNames.includes(unit)) {
-            var obj = this.convertTable[unit];
+        let n = this.i18n.units[unit];
+        if (this.unitNames.includes(n)) {
+            var obj = this.convertTable[n];
             if (obj.hasOwnProperty('unit')) {
                 return obj.unit(value);
             }
         }
-        return `${value} ${unit}`;
+        return `${value} ${n}`;
     }
 
     convert(value, unit) {
-        if (this.unitNames.includes(unit)) {
-            var obj = this.convertTable[unit];
+        let n = this.i18n.units[unit];
+        if (this.unitNames.includes(n)) {
+            var obj = this.convertTable[n];
             if (obj.hasOwnProperty('convert')) {
                 return obj.convert(value);
             }
@@ -145,8 +167,9 @@ export default class Convert {
     }
 
     revert(value, unit) {
-        if (this.unitNames.includes(unit)) {
-            var obj = this.convertTable[unit];
+        let n = this.i18n.units[unit];
+        if (this.unitNames.includes(n)) {
+            var obj = this.convertTable[n];
             if (obj.hasOwnProperty('revert')) {
                 return obj.revert(value);
             }

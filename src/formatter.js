@@ -1,45 +1,51 @@
 import Convert from './convert.js';
-import * as constants from './units.js';
 
 export default class Formatter extends Convert {
-    constructor(conf) {
-        super(conf);
+    constructor(i18n, conf) {
+        super(i18n, conf);
+        this.conf = {};
+        this.configure(conf);
+    }
+
+    configure(conf) {
         this.conf = Object.assign({
-            sport: null,
-            locale: null,
-            units: null
+            sport: 'ciclyng',
+            units: 'international'
         }, conf);
     }
 
     selectUnit(parameter) {
         var expression = parameter + '.' + this.conf.sport + '.' + this.conf.units;
         var rules = {
-             'duration\..*'                      : constants.UNIT_HOURS, // 0:00 h
-             'duration\.minutes\..*'             : constants.UNIT_MINUTES, // 00 min.
-             'duration\.minutes-sec\..*'         : constants.UNIT_MINUTES_SEC, // 00:00
-             'distance\.[^\.]+\.english'         : constants.UNIT_MILES, // Millas
-             'distance\.[^\.]+\.international'   : constants.UNIT_KILOMETERS, // Kilometros
-             'distance\.swimming\.english'       : constants.UNIT_YARDS, // Yardas
-             'distance\.swimming\.international' : constants.UNIT_METERS, // metros
-             'incline\.[^\.]+\.english'          : constants.UNIT_FEETS, // Yardas
-             'incline\.[^\.]+\.international'    : constants.UNIT_METERS, // metros
-             'elevation\.[^\.]+\.english'        : constants.UNIT_FEETS, // Yardas
-             'elevation\.[^\.]+\.international'  : constants.UNIT_METERS, // metros
-             'speed\.[^\.]+\.english'            : constants.UNIT_MILES_HOUR,
-             'speed\.[^\.]+\.international'      : constants.UNIT_KILOMETERS_HOUR,
-             'speed\.swimming\.english'          : constants.UNIT_MIN_100YARDS,
-             'speed\.swimming\.international'    : constants.UNIT_MIN_100METERS,
-             'speed\.running\.english'           : constants.UNIT_MIN_MILE,
-             'speed\.running\.international'     : constants.UNIT_MIN_KILOMETER,
-             'power\..*'                         : constants.UNIT_WATTS,
-             'cadence\..*'                       : constants.UNIT_RPM,
-             'hr\..*'                            : constants.UNIT_PPM,
-             'calories\..*'                      : constants.UNIT_KCAL,
-             'tss\..*'                           : constants.UNIT_TSS,
-             'ctl\..*'                           : constants.UNIT_CTL,
-             'atl\..*'                           : constants.UNIT_ATL,
-             'tsb\..*'                           : constants.UNIT_TSB,
-             'ema\..*'                           : constants.UNIT_EMA,
+             'date\.date\..*'                    : 'UNIT_DATE', 
+             'date\.datetime\..*'                : 'UNIT_DATETIME',
+             'date\.dateday\..*'                 : 'UNIT_DATEDAY', 
+             'duration\..*'                      : 'UNIT_HOURS', // 0:00 h
+             'duration\.minutes\..*'             : 'UNIT_MINUTES', // 00 min.
+             'duration\.minutes-sec\..*'         : 'UNIT_MINUTES_SEC', // 00:00
+             'distance\.[^\.]+\.english'         : 'UNIT_MILES', // Millas
+             'distance\.[^\.]+\.international'   : 'UNIT_KILOMETERS', // Kilometros
+             'distance\.swimming\.english'       : 'UNIT_YARDS', // Yardas
+             'distance\.swimming\.international' : 'UNIT_METERS', // metros
+             'incline\.[^\.]+\.english'          : 'UNIT_FEETS', // Yardas
+             'incline\.[^\.]+\.international'    : 'UNIT_METERS', // metros
+             'elevation\.[^\.]+\.english'        : 'UNIT_FEETS', // Yardas
+             'elevation\.[^\.]+\.international'  : 'UNIT_METERS', // metros
+             'speed\.[^\.]+\.english'            : 'UNIT_MILES_HOUR',
+             'speed\.[^\.]+\.international'      : 'UNIT_KILOMETERS_HOUR',
+             'speed\.swimming\.english'          : 'UNIT_MIN_100YARDS',
+             'speed\.swimming\.international'    : 'UNIT_MIN_100METERS',
+             'speed\.running\.english'           : 'UNIT_MIN_MILE',
+             'speed\.running\.international'     : 'UNIT_MIN_KILOMETER',
+             'power\..*'                         : 'UNIT_WATTS',
+             'cadence\..*'                       : 'UNIT_RPM',
+             'hr\..*'                            : 'UNIT_PPM',
+             'calories\..*'                      : 'UNIT_KCAL',
+             'tss\..*'                           : 'UNIT_TSS',
+             'ctl\..*'                           : 'UNIT_CTL',
+             'atl\..*'                           : 'UNIT_ATL',
+             'tsb\..*'                           : 'UNIT_TSB',
+             'ema\..*'                           : 'UNIT_EMA',
         };
         var ret = '';
         var format = expression.toLowerCase();
@@ -51,12 +57,12 @@ export default class Formatter extends Convert {
         return ret;
     }
 
-    universalNumber = function(number, decimal = 0, zero = true) {
+    universalNumber(number, decimal = 0, zero = true) {
         if ((!zero) && (!number || number == 0)) return '';
         number = (!number) ? 0 : number;
     	var frac = (number - parseInt(number)) * (10 * decimal);
         if ((!zero) && ((parseInt(frac) == 0) && (parseInt(number) == 0))) return '';
-    	var formatter = new Intl.NumberFormat('es-ES', {
+    	var formatter = new Intl.NumberFormat(this.i18n.numbers.locale, {
     	  style: 'decimal',
     	  minimumFractionDigits: (frac > 1) ? decimal : 0,
     	  maximumFractionDigits: (frac > 1) ? decimal : 0,
@@ -67,16 +73,22 @@ export default class Formatter extends Convert {
     	return frm.trim();
     }
 
-    formatDate(timestamp) {
-    	return moment.unix(timestamp).format("DD-MM-YYYY");
+    formatDate(timestamp, showUnits = true) {
+        var unit          = this.selectUnit('date.date');
+        var formatted     = this.convert(timestamp, unit);
+        return (showUnits) ? this.units(formatted, unit) : formatted;
     }
 
-    formatDateTime(timestamp) {
-    	return moment.unix(timestamp).format("DD-MM-YYYY HH:mm");
+    formatDateTime(timestamp, showUnits = true) {
+        var unit          = this.selectUnit('date.datetime');
+        var formatted     = this.convert(timestamp, unit);
+        return (showUnits) ? this.units(formatted, unit) : formatted;
     }
 
-    formatDateDay(timestamp) {
-    	return moment.unix(timestamp).format("ddd<br>DD MMM");
+    formatDateDay(timestamp, showUnits = true) {
+        var unit          = this.selectUnit('date.dateday');
+        var formatted     = this.convert(timestamp, unit);
+        return (showUnits) ? this.units(formatted, unit) : formatted;
     }
 
     formatDistance(meters = 0, showUnits = true, showZero = true) {
