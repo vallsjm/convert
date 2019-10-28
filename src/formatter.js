@@ -65,20 +65,17 @@ export default class Formatter extends Convert {
         return ret;
     }
 
-    universalNumber(number, decimal = 0, zero = true) {
-        if ((!zero) && (!number || number == 0)) return '';
-        number = (!number) ? 0 : number;
-    	var frac = (number - parseInt(number)) * (10 * decimal);
-        if ((!zero) && ((parseInt(frac) == 0) && (parseInt(number) == 0))) return '';
-    	var formatter = new Intl.NumberFormat(this.i18n.numbers.locale, {
-    	  style: 'decimal',
-    	  minimumFractionDigits: (frac > 1) ? decimal : 0,
-    	  maximumFractionDigits: (frac > 1) ? decimal : 0,
-    	});
-    	var frm = formatter.format(number);
-        var n = frm.replace(',','').replace('.','').replace(' ','');
+    universalNumber(number = 0, decimal = 0, zero = true) {
+        if ((!zero) && (!number || parseFloat(number) == 0)) return ''; // para caso zero  = false & number = 0
+        var frac = (number - parseInt(number)) * (10 * decimal);
+        var formated = number.toLocaleString(this.i18n.numbers.locale, {
+            style: 'decimal',
+      	    minimumFractionDigits: (frac > 1) ? decimal : 0,
+      	    maximumFractionDigits: (frac > 1) ? decimal : 0,
+        });
+        var n = formated.replace(',','').replace('.','').replace(' ',''); // para comprobar despues del formateo caso zero  = false & number = 0
         if ((!zero) && (parseFloat(n) == 0)) return '';
-    	return frm.trim();
+    	return formated.trim();
     }
 
     formatDate(timestamp, showUnits = true) {
