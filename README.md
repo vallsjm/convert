@@ -49,4 +49,5 @@ console.log('500.4343434 Metros (natación) son ' + ft.formatDistance(500.434343
 console.log('1572176282 Timestamp son ' + ft.sport('running').formatDate(1572176282));
 console.log('1572176282 Timestamp (en inglés) son ' + ft.locale('en').formatDateTime(1572176282));
 console.log('1572176282 Timestamp (en inglés) son ' + ft.formatDateDay(1572176282));
+
 ```
