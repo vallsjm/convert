@@ -1,25 +1,33 @@
 import Convert from './convert.js';
 
 export default class Formatter extends Convert {
-    constructor(i18n, conf) {
-        super(i18n, conf);
-        this.conf = {};
-        this.configure(conf);
+    constructor(conf) {
+        const params = {
+            locale: 'es',
+            sport: 'ciclyng',
+            metrics: 'international'
+        };
+
+        conf = Object.assign(params, conf);
+        super(conf);
     }
 
-    configure(conf) {
-        this.conf = Object.assign({
-            sport: 'ciclyng',
-            units: 'international'
-        }, conf);
+    sport(sport) {
+        this.conf.sport = sport;
+        return this;
+    }
+
+    metrics(metrics) {
+        this.conf.metrics = metrics;
+        return this;
     }
 
     selectUnit(parameter) {
-        var expression = parameter + '.' + this.conf.sport + '.' + this.conf.units;
+        var expression = parameter + '.' + this.conf.sport + '.' + this.conf.metrics;
         var rules = {
-             'date\.date\..*'                    : 'UNIT_DATE', 
+             'date\.date\..*'                    : 'UNIT_DATE',
              'date\.datetime\..*'                : 'UNIT_DATETIME',
-             'date\.dateday\..*'                 : 'UNIT_DATEDAY', 
+             'date\.dateday\..*'                 : 'UNIT_DATEDAY',
              'duration\..*'                      : 'UNIT_HOURS', // 0:00 h
              'duration\.minutes\..*'             : 'UNIT_MINUTES', // 00 min.
              'duration\.minutes-sec\..*'         : 'UNIT_MINUTES_SEC', // 00:00

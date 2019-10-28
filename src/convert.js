@@ -1,16 +1,25 @@
+import i18n from './locales.js';
 import moment from 'moment'
 
 export default class Convert {
-    constructor(i18n, conf) {
+    constructor(conf) {
         this.convertTable = {};
         this.unitNames    = [];
-        this.i18n = i18n;
-        moment.locale(i18n.dates.locale);
-        this.load();
+        this.conf         = conf;
+        this.locale(conf.locale);
     }
-  
+
+    locale(locale) {
+        this.conf.locale = locale;
+        this.i18n        = i18n[locale];
+        moment.locale(this.i18n.dates.locale);
+        this.load();
+        return this;
+    }
+
     load() {
         let t = this.i18n.units;
+        this.convertTable = {};
 
         this.convertTable[t.UNIT_DATE] = {
             unit: function (value) {
@@ -44,7 +53,7 @@ export default class Convert {
             revert: function (value) {
                         return moment(value, t.UNIT_DATE).unix();
                     }
-        };                
+        };
         this.convertTable[t.UNIT_KILOMETERS] = {
             digits: 2,
             unit: function (value) {
