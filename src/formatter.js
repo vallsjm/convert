@@ -67,7 +67,7 @@ export default class Formatter extends Convert {
 
     universalNumber(number = 0, decimal = 0, zero = true) {
         if ((!zero) && (!number || parseFloat(number) == 0)) return ''; // para caso zero  = false & number = 0
-        var frac = (number - parseInt(number)) * (10 * decimal);
+        var frac = (number - parseInt(number)) * Math.pow(10, decimal);
         var formated = number.toLocaleString(this.i18n.numbers.locale, {
             style: 'decimal',
       	    minimumFractionDigits: (frac > 1) ? decimal : 0,
@@ -101,6 +101,7 @@ export default class Formatter extends Convert {
         var digits    = this.digits(unit);
         var num       = this.convert(meters, unit);
         var formatted = this.universalNumber(num, digits, showZero);
+
         return (showUnits) ? this.units(formatted, unit) : formatted;
     }
 
