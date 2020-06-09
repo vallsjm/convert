@@ -67,11 +67,13 @@ export default class Formatter extends Convert {
 
     universalNumber(number = 0, decimal = 0, zero = true) {
         if ((!zero) && (!number || parseFloat(number) == 0)) return ''; // para caso zero  = false & number = 0
-        var frac = (number - parseInt(number)) * Math.pow(10, decimal);
+        var frac = (number - parseInt(number) + Number.EPSILON) * Math.pow(10, decimal);
         var formated = number.toLocaleString(this.i18n.numbers.locale, {
             style: 'decimal',
-      	    minimumFractionDigits: (frac > 1) ? decimal : 0,
-      	    maximumFractionDigits: (frac > 1) ? decimal : 0,
+            minimumFractionDigits: decimal,
+            maximumFractionDigits: decimal
+      	    //minimumFractionDigits: (frac > 1) ? decimal : 0,
+      	    //maximumFractionDigits: (frac > 1) ? decimal : 0,
         });
         var n = formated.replace(',','').replace('.','').replace(' ',''); // para comprobar despues del formateo caso zero  = false & number = 0
         if ((!zero) && (parseFloat(n) == 0)) return '';

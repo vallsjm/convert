@@ -35,4 +35,4 @@ let ft1 = new Formatter({
     sport: 'ciclyng',
     metrics: 'INTERNATIONAL'
 });
-console.log('error: ' + ft1.formatDistance(44.79999999999923764));
+console.log('error: ' + ft1.formatSpeed(0.00));

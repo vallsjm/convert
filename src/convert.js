@@ -138,6 +138,9 @@ export default class Convert {
                         return (value) ? 5.4864 / value : 0;
                     }
         };
+        this.convertTable[t.UNIT_KILOMETERS_HOUR] = {
+            digits: 2
+        };
 
         this.unitNames = Object.keys(this.convertTable);
     }
